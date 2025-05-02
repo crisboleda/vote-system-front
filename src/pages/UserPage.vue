@@ -9,6 +9,18 @@
     <v-btn icon="mdi-export" @click="logout"></v-btn>
   </v-toolbar>
 
+  <VoteForm
+    :dialog="dialog"
+    :question="questionSelected"
+    @voted="handleQuestionVoted"
+    @closeVoteForm="dialog = false"
+  />
+  <QuestionResults
+    :dialog="showQuestionResultsDialog"
+    :question="questionSelected"
+    @closeQuestionResults="showQuestionResultsDialog = false"
+  />
+
   <v-container fluid class="my-6">
     <v-row>
       <v-col v-for="(question, i) in questions" :key="i" md="12" cols="12">
@@ -25,8 +37,20 @@
             </v-card-title>
           </div>
           <div>
-            <v-btn v-if="!question.answered" color="green" class="mx-1">Votar</v-btn>
-            <v-btn v-if="question.answered" color="blue" class="mx-1">Resultados</v-btn>
+            <v-btn
+              v-if="!question.answered"
+              @click="() => openQuestionVoteModal(question.id)"
+              color="green"
+              class="mx-1"
+              >Votar</v-btn
+            >
+            <v-btn
+              v-if="question.answered"
+              @click="() => openQuestionResultsModal(question.id)"
+              color="blue"
+              class="mx-1"
+              >Resultados</v-btn
+            >
           </div>
         </v-card>
       </v-col>
@@ -39,8 +63,28 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import api from '../services/api'
 import router from '@/router'
+import VoteForm from '@/components/VoteForm.vue'
+import QuestionResults from '@/components/QuestionResults.vue'
 
 const questions = ref([])
+const questionSelected = ref(null)
+const dialog = ref(false)
+const showQuestionResultsDialog = ref(false)
+
+const handleQuestionVoted = async () => {
+  dialog.value = false
+  await getQuestions()
+}
+
+const openQuestionVoteModal = (questionId) => {
+  dialog.value = true
+  questionSelected.value = questions.value.find((question) => question.id == questionId)
+}
+
+const openQuestionResultsModal = (questionId) => {
+  showQuestionResultsDialog.value = true
+  questionSelected.value = questions.value.find((question) => question.id == questionId)
+}
 
 const logout = async () => {
   try {
@@ -61,19 +105,18 @@ const logout = async () => {
   }
 }
 
-const vote = async (questionId, optionId) => {
+const getQuestions = async () => {
   try {
-    await api.post(`/questions/${questionId}/vote`, { option_id: optionId })
-    alert('Voto registrado correctamente')
+    const response = await api.get('/questions', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+    })
+    questions.value = response.data
   } catch (error) {
-    alert(error.response?.data?.message || 'Error al votar')
+    if (error.status === 401) {
+      router.push('/login')
+    }
   }
 }
 
-onMounted(async () => {
-  const response = await api.get('/questions', {
-    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-  })
-  questions.value = response.data
-})
+onMounted(async () => await getQuestions())
 </script>

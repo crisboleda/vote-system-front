@@ -11,7 +11,6 @@
         <v-tab :value="1">CREAR PREGUNTAS</v-tab>
         <v-tab :value="2">CREAR PROPIETARIO</v-tab>
         <v-tab :value="3">VER PREGUNTAS</v-tab>
-        <v-tab :value="4">VER PROPIETARIOS</v-tab>
       </v-tabs>
     </template>
 
@@ -22,7 +21,6 @@
     <v-tabs-window-item :value="1"> <QuestionForm /> </v-tabs-window-item>
     <v-tabs-window-item :value="2"> <UserForm /> </v-tabs-window-item>
     <v-tabs-window-item :value="3"> <ListQuestions /> </v-tabs-window-item>
-    <v-tabs-window-item :value="4"> </v-tabs-window-item>
   </v-tabs-window>
 </template>
 
@@ -53,15 +51,6 @@ const logout = async () => {
     router.push('/login')
   } catch (error) {
     console.error('Error al cerrar sesión:', error)
-  }
-}
-
-const vote = async (questionId, optionId) => {
-  try {
-    await api.post(`/questions/${questionId}/vote`, { option_id: optionId })
-    alert('Voto registrado correctamente')
-  } catch (error) {
-    alert(error.response?.data?.message || 'Error al votar')
   }
 }
 </script>

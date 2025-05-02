@@ -26,13 +26,18 @@ npm run lint
 
 ## Imagenes de la Interfaz
 
-Login:
+### Login:
+
 ![login](./docs/login.png)
 
-Admin Page:
+### User page:
+
+![login](./docs/user.png)
+![login](./docs/vote.png)
+![login](./docs/results.png)
+
+### Admin Page:
+
 ![login](./docs/create-question.png)
 ![login](./docs/create-user.png)
 ![login](./docs/show-q.png)
-
-User page:
-![login](./docs/user.png)
